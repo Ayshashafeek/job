@@ -244,3 +244,15 @@ https://github.com/Ayshashafeek/job
 ```
 
 Do not commit `node_modules`. The included `.gitignore` excludes it.
+
+screenshots
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f6a15a4a-fb3c-426d-8e42-561ec239aa56" />
+<img width="1920" height="1080" alt="Screenshot 2026-09-10 071819" src="https://github.com/user-attachments/assets/eeb37cf8-a33c-4f43-a8dc-7e858e263473" />
+<img width="1920" height="1080" alt="Screenshot 2026-09-10 071802" src="https://github.com/user-attachments/assets/8454acaf-4952-4aa5-a923-3f3debdc9680" />
+<img width="1920" height="1080" alt="Screenshot 2026-09-10 071741" src="https://github.com/user-attachments/assets/e2011496-5ace-4e48-96e8-ea96ce6c1fde" />
+<img width="1920" height="1080" alt="Screenshot 2026-09-10 071710" src="https://github.com/user-attachments/assets/25abd180-b884-4887-a4d5-8a1a3e4def2f" />
+
+
+
+
+
