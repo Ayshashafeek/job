@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const express = require('express');
-const { Inngest } = require('inngest');
+const { Inngest, cron } = require('inngest');
 const { serve } = require('inngest/express');
 
 const app = express();
@@ -29,17 +29,28 @@ const makeReport = inngest.createFunction(
     id: 'make-report',
     retries: 2,
     triggers: [{ event: 'report/requested' }],
+    onFailure: async ({ event }) => {
+      const reportId = event.data?.event?.data?.id;
+      const report = reports.get(reportId);
+
+      if (report) {
+        reports.set(reportId, {
+          ...report,
+          status: 'failed',
+        });
+      }
+    },
   },
   async ({ event, step }) => {
     await step.sleep('do-the-slow-work', '8s');
 
-    const { id, topic } = event.data;
-
-    if (topic === 'fail') {
-      throw new Error('The report oven is broken!');
-    }
-
     return step.run('build-report', async () => {
+      const { id, topic } = event.data;
+
+      if (topic === 'fail') {
+        throw new Error('The report oven is broken!');
+      }
+
       const report = {
         id,
         topic,
@@ -50,6 +61,30 @@ const makeReport = inngest.createFunction(
       reports.set(id, report);
       return report;
     });
+  }
+);
+
+const heartbeat = inngest.createFunction(
+  {
+    id: 'heartbeat',
+    triggers: [cron('* * * * *')],
+  },
+  async () => {
+    const counts = {
+      pending: 0,
+      done: 0,
+      failed: 0,
+    };
+
+    for (const report of reports.values()) {
+      counts[report.status] += 1;
+    }
+
+    console.log(
+      `[heartbeat] pending=${counts.pending} done=${counts.done} failed=${counts.failed}`
+    );
+
+    return counts;
   }
 );
 
@@ -111,7 +146,7 @@ app.use(
   '/api/inngest',
   serve({
     client: inngest,
-    functions: [sayHello, makeReport],
+    functions: [sayHello, makeReport, heartbeat],
   })
 );
 
@@ -128,7 +163,3 @@ server.on('error', (err) => {
 server.on('close', () => {
   console.log('SERVER CLOSED');
 });
-
-setInterval(() => {
-  console.log('Server is still alive...');
-}, 5000);
